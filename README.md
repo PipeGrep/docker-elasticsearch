@@ -2,11 +2,12 @@
 
 ## Features
 * Elasticsearch
+* [JDBC / Postgresql rivers](https://github.com/jprante/elasticsearch-jdbc/)
 * Reverse proxy (Nginx)
 * HTTP Basic auth
 * Elasticsearch plugins (monitoring / GUIs) :
-  * head
-  * HQ
+  * [head](http://mobz.github.io/elasticsearch-head/)
+  * [HQ](https://github.com/royrusso/elasticsearch-HQ)
 * cron task to flush logs
 * index in a volume
 
@@ -22,7 +23,22 @@ Then add you custom configuration file. Ex :
 ADD             my-nginx.conf /etc/nginx/nginx.conf
 ```
 
-## Run
+## Basic authentification
+You can update the basic auth passwords by overriding default passwords :
+```
+printf "readonly:`openssl passwd -crypt mySearchPassword`\n"   > readonly.passwd
+printf "admin:`openssl passwd -crypt myAdminPassword`\n"   > admin.passwd
+```
+
+With the following Dockerfile :
+```
+FROM samber/elasticsearch
+
+ADD readonly.passwd /app
+ADD admin.passwd /app
+```
+
+## Usage
 
 ### Get the image from the hub
 ```
