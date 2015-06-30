@@ -20,7 +20,7 @@ FROM samber/elasticsearch
 
 Then add you custom configuration file. Ex :
 ```
-ADD             my-nginx.conf /etc/nginx/nginx.conf
+ADD my-nginx.conf /etc/nginx/nginx.conf
 ```
 
 ## Basic authentification
