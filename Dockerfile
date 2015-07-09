@@ -10,7 +10,9 @@ MAINTAINER Samuel BERTHE for Grep <pipe@grep.so>
 
 
 
-ENV ES_PKG_NAME elasticsearch-1.4.1
+ENV ES_PKG_NAME elasticsearch-1.6.0
+ENV ES_RIVER_PATH http://xbib.org/repository/org/xbib/elasticsearch/importer/elasticsearch-jdbc/1.6.0.0/elasticsearch-jdbc-1.6.0.0-dist.zip
+ENV ES_JDBCDRIVER_JAR postgresql-9.1-902.jdbc4.jar
 
 # Install Elasticsearch.
 RUN \
@@ -26,8 +28,8 @@ ADD elasticsearch.yml /elasticsearch/config/elasticsearch.yml
 
 # Add JDBC postgres driver
 #RUN mkdir /data/data ; mkdir /data/log ; mkdir /data/plugins ; mkdir /data/plugins/river-jdbc ; mkdir /data/work
-RUN /elasticsearch/bin/plugin --install jdbc --url http://xbib.org/repository/org/xbib/elasticsearch/plugin/elasticsearch-river-jdbc/1.4.0.10/elasticsearch-river-jdbc-1.4.0.10.zip
-ADD https://jdbc.postgresql.org/download/postgresql-9.4-1201.jdbc41.jar /data/plugins/river-jdbc/
+RUN /elasticsearch/bin/plugin --install jdbc --url $ES_RIVER_PATH
+ADD https://jdbc.postgresql.org/download/$ES_JDBCDRIVER_JAR /data/plugins/river-jdbc/
 
 
 # Add GUIs
