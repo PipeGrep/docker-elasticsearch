@@ -30,6 +30,7 @@ ADD elasticsearch.yml /elasticsearch/config/elasticsearch.yml
 #RUN mkdir /data/data ; mkdir /data/log ; mkdir /data/plugins ; mkdir /data/plugins/river-jdbc ; mkdir /data/work
 RUN /elasticsearch/bin/plugin --install jdbc --url $ES_RIVER_PATH
 ADD https://jdbc.postgresql.org/download/$ES_JDBCDRIVER_JAR /data/plugins/river-jdbc/
+RUN mv /data/plugins/jdbc/lib/* /data/plugins/jdbc
 
 
 # Add GUIs
