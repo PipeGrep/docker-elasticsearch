@@ -15,7 +15,7 @@
 
 To update settings, just create a Dockerfile with the following base image :
 ```
-FROM samber/elasticsearch
+FROM pipegrep/docker-elasticsearch
 ```
 
 Then add you custom configuration file. Ex :
@@ -32,7 +32,7 @@ printf "admin:`openssl passwd -crypt myAdminPassword`\n"   > admin.passwd
 
 With the following Dockerfile :
 ```
-FROM samber/elasticsearch
+FROM pipegrep/docker-elasticsearch
 
 ADD readonly.passwd /app
 ADD admin.passwd /app
@@ -42,7 +42,7 @@ ADD admin.passwd /app
 
 ### Get the image from the hub
 ```
-docker pull samber/elasticsearch
+docker pull pipegrep/docker-elasticsearch
 ```
 
 ### Build a custom image
@@ -53,9 +53,9 @@ docker build -t myproject/elasticsearch .
 ### Run the container
 ```
 # Without persistance
-docker run -d -p 80:80 -p 8080:8080 samber/elasticsearch
+docker run -d -p 80:80 -p 8080:8080 pipegrep/docker-elasticsearch
 # With persistance
-docker run -d -p 80:80 -p 8080:8080 -v /your/home/directory:/data samber/elasticsearch
+docker run -d -p 80:80 -p 8080:8080 -v /your/home/directory:/data pipegrep/docker-elasticsearch
 ```
 
 
