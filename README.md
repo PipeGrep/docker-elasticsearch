@@ -2,14 +2,14 @@
 
 ## Features
 * Elasticsearch
-* [JDBC / Postgresql rivers](https://github.com/jprante/elasticsearch-jdbc/)
+* [JDBC / Postgresql importer](https://github.com/jprante/elasticsearch-jdbc/)
 * Reverse proxy (Nginx)
 * HTTP Basic auth
 * Elasticsearch plugins (monitoring / GUIs) :
   * [head](http://mobz.github.io/elasticsearch-head/)
-  * [HQ](https://github.com/royrusso/elasticsearch-HQ)
-* cron task to flush logs
-* index in a volume
+    * [HQ](https://github.com/royrusso/elasticsearch-HQ)
+    * cron task to flush logs
+    * index in a volume
 
 ## Settings
 
@@ -21,7 +21,7 @@ FROM pipegrep/docker-elasticsearch
 Then add you custom configuration file. Ex :
 ```
 ADD my-nginx.conf /etc/nginx/nginx.conf
-```
+
 
 ## Basic authentification
 You can update the basic auth passwords by overriding default passwords :
@@ -45,6 +45,36 @@ ADD admin.passwd /app
 docker pull pipegrep/docker-elasticsearch
 ```
 
+### Add an importer
+
+Dockerfile :
+```
+FROM pipegrep/docker-elasticsearch
+
+ADD start.sh /app
+ADD init.sh /app
+```
+
+start.sh :
+```
+#!/bin/bash
+
+service nginx start
+./init.sh &
+/elasticsearch/bin/elasticsearch
+```
+
+init.sh :
+```
+#!/bin/bash
+
+bin=/app/jdbc-importer/elasticsearch-jdbc-1.6.0.0/bin
+lib=/app/jdbc-importer/elasticsearch-jdbc-1.6.0.0/lib
+
+cat importer-config.json | java  -cp "${lib}/*" -Dlog4j.configurationFile=${bin}/log4j2.xml org.xbib.tools.Runner org.xbib.tools.JDBCImporter
+```
+
+
 ### Build a custom image
 ```
 docker build -t myproject/elasticsearch .
@@ -57,5 +87,3 @@ docker run -d -p 80:80 -p 8080:8080 pipegrep/docker-elasticsearch
 # With persistance
 docker run -d -p 80:80 -p 8080:8080 -v /your/home/directory:/data pipegrep/docker-elasticsearch
 ```
-
-

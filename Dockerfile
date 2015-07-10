@@ -10,39 +10,6 @@ MAINTAINER Samuel BERTHE for Grep <pipe@grep.so>
 
 
 
-ENV ES_PKG_NAME elasticsearch-1.6.0
-ENV ES_RIVER_PATH http://xbib.org/repository/org/xbib/elasticsearch/importer/elasticsearch-jdbc/1.6.0.0/elasticsearch-jdbc-1.6.0.0-dist.zip
-ENV ES_JDBCDRIVER_JAR postgresql-9.1-902.jdbc4.jar
-
-# Install Elasticsearch.
-RUN \
-  cd / && \
-  wget https://download.elasticsearch.org/elasticsearch/elasticsearch/$ES_PKG_NAME.tar.gz && \
-  tar xvzf $ES_PKG_NAME.tar.gz && \
-  rm -f $ES_PKG_NAME.tar.gz && \
-  mv /$ES_PKG_NAME /elasticsearch
-
-# Mount elasticsearch.yml config
-ADD elasticsearch.yml /elasticsearch/config/elasticsearch.yml
-
-
-# Add JDBC postgres driver
-#RUN mkdir /data/data ; mkdir /data/log ; mkdir /data/plugins ; mkdir /data/plugins/river-jdbc ; mkdir /data/work
-RUN /elasticsearch/bin/plugin --install jdbc --url $ES_RIVER_PATH
-ADD https://jdbc.postgresql.org/download/$ES_JDBCDRIVER_JAR /data/plugins/river-jdbc/
-RUN mv /data/plugins/jdbc/lib/* /data/plugins/jdbc
-
-
-# Add GUIs
-RUN /elasticsearch/bin/plugin --install royrusso/elasticsearch-HQ
-RUN /elasticsearch/bin/plugin --install mobz/elasticsearch-head
-
-
-
-
-
-
-
 # Install nginx
 RUN             apt-get update && apt-get install -y ca-certificates nginx cron
 
@@ -57,9 +24,40 @@ ADD             nginx.conf /etc/nginx/nginx.conf
 
 
 
+# Install Elasticsearch.
 
-# Init indices and rivers
-RUN mkdir /app
+ENV ES_PKG_NAME elasticsearch-1.6.0
+ENV ES_IMPORTER_PATH http://xbib.org/repository/org/xbib/elasticsearch/importer/elasticsearch-jdbc/1.6.0.0/elasticsearch-jdbc-1.6.0.0-dist.zip
+ENV ES_JDBCDRIVER_PATH https://jdbc.postgresql.org/download/postgresql-9.1-902.jdbc4.jar
+ENV JDBC_IMPORTER_HOME /app/jdbc-importer
+
+
+RUN \
+  cd / && \
+  wget https://download.elasticsearch.org/elasticsearch/elasticsearch/$ES_PKG_NAME.tar.gz && \
+  tar xvzf $ES_PKG_NAME.tar.gz && \
+  rm -f $ES_PKG_NAME.tar.gz && \
+  mv /$ES_PKG_NAME /elasticsearch
+
+# Mount elasticsearch.yml config
+ADD elasticsearch.yml /elasticsearch/config/elasticsearch.yml
+
+# Add JDBC postgres driver
+ADD $ES_IMPORTER_PATH $JDBC_IMPORTER_HOME/elasticsearch-jdbc.zip
+RUN unzip $JDBC_IMPORTER_HOME/elasticsearch-jdbc.zip -d $JDBC_IMPORTER_HOME && mv $JDBC_IMPORTER_HOME/elasticsearch-jdbc-* $JDBC_IMPORTER_HOME/elasticsearch-jdbc
+ADD $ES_JDBCDRIVER_PATH $JDBC_IMPORTER_HOME/elasticsearch-jdbc/lib/
+
+# Add GUIs
+RUN /elasticsearch/bin/plugin --install royrusso/elasticsearch-HQ
+RUN /elasticsearch/bin/plugin --install mobz/elasticsearch-head
+
+
+
+
+
+
+
+# Init indices and importers
 ADD . /app
 RUN chmod +x /app/start.sh /app/crontab.sh
 RUN crontab /app/crontab.sh
@@ -72,6 +70,6 @@ VOLUME ["/data"]
 CMD ["sh", "-c", "./start.sh"]
 
 # Expose ports.
-#   - 9200: HTTP
-#   - 9300: transport
+#   - 80: public
+#   - 8080: admin
 EXPOSE 80 8080
