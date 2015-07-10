@@ -48,9 +48,9 @@ RUN unzip $JDBC_IMPORTER_HOME/elasticsearch-jdbc.zip -d $JDBC_IMPORTER_HOME && m
 ADD $ES_JDBCDRIVER_PATH $JDBC_IMPORTER_HOME/elasticsearch-jdbc/lib/
 
 # Add GUIs
-RUN mkdir /data/plugins && mkdir /data/plugins/head && mkdir /data/plugins/HQ
-RUN cd /data/plugins/HQ && wget https://github.com/royrusso/elasticsearch-HQ/archive/master.zip && unzip *.zip
-RUN cd /data/plugins/HQ && wget https://github.com/elasticsearch-head/archive/master.zip && unzip *.zip
+RUN mkdir /data/plugins ; mkdir /data/plugins/head && mkdir /data/plugins/HQ
+RUN cd /data/plugins/HQ && wget https://github.com/royrusso/elasticsearch-HQ/archive/master.zip && unzip *.zip && mv *-master _site
+RUN cd /data/plugins/head && wget https://github.com/mobz/elasticsearch-head/archive/master.zip && unzip *.zip && mv *-master _site
 #RUN /elasticsearch/bin/plugin --install royrusso/elasticsearch-HQ
 #RUN /elasticsearch/bin/plugin --install mobz/elasticsearch-head
 
